@@ -10,14 +10,35 @@ Power any javascript file in your project with static generation. Easy to use, e
 $ npm install --save-dev static-content-evaluation-webpack-plugin
 ```
 
+## What it does
+
+This plugin reads your javascript files during build time looking for an exported function to execute at build time. It then takes the return value of that function and inserts it into any references to a predetermined expression. For example if this was your javascript file
+
+```js
+export const Static = async () => {
+	const name = await yourApiCallHere() // returns string 'world'
+	return name
+}
+
+export const greet = () => `hello ${__STATIC__}`
+```
+
+this plugin will read your file and detect the exported async function Static and execute it returning the value of the api call. The plugin would then read through the rest of the file looking for a predetermined expression (by default the string '\_\_STATIC\_\_') and replace that expression with the return value of the function. So assuming the api call returns the string 'world' the exported greet function would have a return value of 'hello world'. The default name of the exported function it looks for and the expression that it replaces can be configured by passed in options.
+
+## Current Limitations
+
+Right now you cannot use the \_\_STATIC\_\_ value at the top level of a file, as it is not defined when the module is loaded to execute the Static function which causes an error to be thrown.
+
 ## Usage
 
 Ensure you have webpack installed, e.g. `npm install -g webpack`
 
 ### webpack.config.js
 
+Add static-static-content-valuation-webpack-plugin to your plugins array.
+
 ```js
-const StaticSiteGeneratorPlugin = require('static-site-generator-webpack-plugin');
+const StaticContentEvaluationWebpackPlugin = require('static-content-evaluation-webpack-plugin');
 
 module.exports = {
 
@@ -36,6 +57,8 @@ module.exports = {
 ```
 
 ### index.js
+
+Start exporting Static functions and using the injected expression (by default \_\_Static\_\_) to created statically built apps. It's that easy!
 
 ```js
 // By default any file that exports a function named 'Static' will executed at build time
