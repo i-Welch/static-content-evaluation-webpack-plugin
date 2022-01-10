@@ -51,7 +51,7 @@ StaticContentEvaluationWebpackPlugin.prototype.apply = function(compiler) {
 				modules.forEach((module) => {
 					results.push(new Promise(res => {
 						compilation.executeModule(module, {}, (_, result) => {
-							if (typeof result.exports[pluginOptions.staticFunctionName] === 'function') {
+							if (result.exports && typeof result.exports[pluginOptions.staticFunctionName] === 'function') {
 								const startTime = Date.now()
 								result.exports[pluginOptions.staticFunctionName]().then((resp) => {
 									module.addDependency(
@@ -63,8 +63,10 @@ StaticContentEvaluationWebpackPlugin.prototype.apply = function(compiler) {
 									logEvaluationTime(module, startTime)
 									res()
 								})
-							} else {
+							} else if (results.exports) {
 								res(null)
+							} else {
+								throw new Error(`${module.resource} failed during execution of static functions`)
 							}
 						})
 					}))
