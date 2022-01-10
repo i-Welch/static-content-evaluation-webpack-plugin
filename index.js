@@ -17,9 +17,11 @@ class StaticInsertionDependency extends Dependency {
 
 class StaticInsertionDependencyTemplate {
 	apply(dep, source) {
-		dep.ranges.forEach(range => {
-			source.replace(range[0], range[1] - 1, '(' + JSON.stringify(dep.data) + ')')
-		})
+		if (dep.ranges) {
+			dep.ranges.forEach(range => {
+				source.replace(range[0], range[1] - 1, '(' + JSON.stringify(dep.data) + ')')
+			})
+		}
 	}
 }
 

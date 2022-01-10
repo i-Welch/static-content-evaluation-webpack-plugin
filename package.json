@@ -1,6 +1,6 @@
 {
   "name": "static-content-evaluation-webpack-plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "minimal, unopinionated static content evaluation powered by webpack",
   "main": "index.js",
   "scripts": {

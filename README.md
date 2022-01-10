@@ -20,14 +20,14 @@ export const Static = async () => {
 	return name
 }
 
-export const greet = () => `hello ${__STATIC__}`
+export const greet = () => `hello ${__Static__}`
 ```
 
-this plugin will read your file and detect the exported async function Static and execute it returning the value of the api call. The plugin would then read through the rest of the file looking for a predetermined expression (by default the string '\_\_STATIC\_\_') and replace that expression with the return value of the function. So assuming the api call returns the string 'world' the exported greet function would have a return value of 'hello world'. The default name of the exported function it looks for and the expression that it replaces can be configured by passed in options.
+this plugin will read your file and detect the exported async function Static and execute it returning the value of the api call. The plugin would then read through the rest of the file looking for a predetermined expression (by default the string '\_\_Static\_\_') and replace that expression with the return value of the function. So assuming the api call returns the string 'world' the exported greet function would have a return value of 'hello world'. The default name of the exported function it looks for and the expression that it replaces can be configured by passed in options.
 
 ## Current Limitations
 
-Right now you cannot use the \_\_STATIC\_\_ value at the top level of a file, as it is not defined when the module is loaded to execute the Static function which causes an error to be thrown.
+Right now you cannot use the \_\_Static\_\_ value at the top level of a file, as it is not defined when the module is loaded to execute the Static function which causes an error to be thrown.
 
 ## Usage
 
