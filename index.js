@@ -50,31 +50,43 @@ StaticContentEvaluationWebpackPlugin.prototype.apply = function(compiler) {
 				const results = []
 				modules.forEach((module) => {
 					results.push(new Promise(res => {
-						compilation.executeModule(module, {}, (_, result) => {
-							if (result.exports && typeof result.exports[pluginOptions.staticFunctionName] === 'function') {
-								const startTime = Date.now()
-								result.exports[pluginOptions.staticFunctionName]().then((resp) => {
-									module.addDependency(
-										new StaticInsertionDependency(
-											referencesKeyedByResource[module.resource],
-											resp
+						if (module.resource && !module.resource.includes('node_modules') && referencesKeyedByResource[module.resource]) {
+							compilation.executeModule(module, {
+								entryOptions: {
+									name: 'static-evaluation-plugin',
+									chunkLoading: 'async-node'
+								}
+							}, (err, result) => {
+								if (result && result.exports && typeof result.exports[pluginOptions.staticFunctionName] === 'function') {
+									const startTime = Date.now()
+									result.exports[pluginOptions.staticFunctionName]().then((resp) => {
+										module.addDependency(
+											new StaticInsertionDependency(
+												referencesKeyedByResource[module.resource],
+												resp
+											)
 										)
-									)
-									logEvaluationTime(module, startTime)
-									res()
-								})
-							} else if (results.exports) {
-								res(null)
-							} else {
-								throw new Error(`${module.resource} failed during execution of static functions`)
-							}
-						})
+										logEvaluationTime(module, startTime)
+										res()
+									})
+								} else if (result && result.exports) {
+									res(null)
+								} else {
+									console.log(err)
+									console.log('This file seemed to fail during the build process: ' + module.resource)
+									throw new Error(`${module.resource} failed during execution of static functions`)
+								}
+							})
+						} else {
+							res(null)
+						}
 					}))
 				})
 				Promise.all(results).then(() => {
 					done()
 				})
 			} catch (err) {
+				console.log(err)
 				done()
 			}
 		}
